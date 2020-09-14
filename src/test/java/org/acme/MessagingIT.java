@@ -23,6 +23,7 @@ public class MessagingIT {
 
     @Test
     public void happyPath() throws JMSException {
+        System.out.println("I am here");
         log.info("Happy path starting..");
         ActiveMQQueue topic = new ActiveMQQueue("MY.TOPIC");
 
