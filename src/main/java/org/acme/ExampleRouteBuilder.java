@@ -5,8 +5,12 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.apache.camel.model.dataformat.JsonLibrary;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Map;
 
+@ApplicationScoped
 public class ExampleRouteBuilder extends RouteBuilder {
     @Override
     public void configure() throws Exception {
@@ -19,8 +23,6 @@ public class ExampleRouteBuilder extends RouteBuilder {
         getContext().addComponent("amq", amq);
 
         from("activemq:queue:MY.QUEUE")
-                .unmarshal()
-                .json(JsonLibrary.Jackson)
-                .log("Got something");
+                .process("ruleProcessor");
     }
 }
