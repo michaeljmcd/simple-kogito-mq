@@ -1,5 +1,6 @@
 package org.acme;
 
+import io.quarkus.test.junit.QuarkusTest;
 import lombok.SneakyThrows;
 import lombok.extern.jbosslog.JBossLog;
 import lombok.extern.slf4j.Slf4j;
@@ -12,25 +13,22 @@ import org.junit.jupiter.api.*;
 
 import javax.jms.*;
 
+@QuarkusTest
 @JBossLog
-public class MessagingIT {
-    ConnectionFactory connectionFactory;
-
-    @SneakyThrows
-    public MessagingIT() {
-        connectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-    }
-
+public class MessagingTest {
     @Test
-    public void happyPath() throws JMSException {
+    public void happyPath() throws JMSException, InterruptedException {
+        ActiveMQConnectionFactory connectionFactory;
+        connectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
+
         System.out.println("I am here");
         log.info("Happy path starting..");
-        ActiveMQQueue topic = new ActiveMQQueue("MY.TOPIC");
+        ActiveMQQueue topic = new ActiveMQQueue("MY.QUEUE");
 
         Connection conn = connectionFactory.createConnection();
+        conn.start();
         Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        /*
         MessageConsumer consumer = session.createConsumer(topic);
         consumer.setMessageListener(new MessageListener() {
             @SneakyThrows
@@ -39,7 +37,6 @@ public class MessagingIT {
                 System.out.println("Received: " + ((ActiveMQTextMessage)message).getText());
             }
         });
-         */
 
         MessageProducer producer = session.createProducer(topic);
 
@@ -49,5 +46,7 @@ public class MessagingIT {
 
         session.close();
         conn.close();
+
+        Thread.sleep(3000L);
     }
 }
